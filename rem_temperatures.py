@@ -58,6 +58,8 @@ def main():
     print(rem_t)
     # print('Number of Replicas')
     print(len(rem_t))
+    for t in enumerate(rem_t):
+        pass
     
     plt.plot(np.arange(len(rem_1)), np.array([tmin] * len(rem_1)), label='Tmin')
     plt.plot(np.arange(len(rem_1)), np.array([tmax] * len(rem_1)), label='Tmax')
@@ -70,19 +72,17 @@ def _tominimize(f, tmin, tmax, N):
     return tmax - temp_list[-1]
     
 def _getTemps(tmin, N, f):
-    k = 0
 
     rem_t = [tmin]
     while True:
-        k += 1
+        if len(rem_t) == N: break
         rem_t.append(rem_t[-1] + _DeltaT(rem_t[-1],f))
-        if k == N: break
 
     return rem_t
 
 
 def _DeltaT(T, f):
-    return T ** (0.5) * f
+    return T*f
 
 
 def _parser():
