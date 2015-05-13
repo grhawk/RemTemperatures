@@ -7,10 +7,7 @@ import sys
 import numpy as np
 import scipy.optimize as optim
 
-kb = 1.3806488E-23  # m^2 kg s^-2 K^-1 -> kjoule/K
-precision = 0.1  # Precision used in various computations
-interval = 0.01  # Interval used in sharpening or shallowing the temeperatures
-factor = 3
+factor = 3  # This is used to initialize the least-square method
 
 def main():
 
@@ -21,48 +18,23 @@ def main():
 #    rp = 1. - args.rp
 
     f = optim.leastsq(_tominimize, factor, args=(tmin, tmax, N))[0][0]
-    print(f)
     rem_t = _getTemps(tmin, N, f)
     plt.plot(np.arange(len(rem_t)), np.array(rem_t), '-*', label='1st Guess')
-    rem_1 = rem_t
 
-
-
-    
-    # if tmax > rem_t[-1] - (rem_t[-1] - rem_t[-2])*(rp):
-    #     print('TRUE')
-    #     k = 0
-    #     f = 1
-    #     while rem_t[-1] > tmax+interval*tmax:
-    #         f += -1*precision
-    #         rem_t = _getTemps(tmin, tmax, c2, N, f)
-    #         k += 1
-    #         if args.debug_flag: print (k, rem_t[-1])
-    # else:
-    #     k = 0
-    #     f = 1
-    #     print(tmax, rem_t[-1]-interval*tmax)
-    #     while rem_t[-1] > tmax+interval*tmax:
-    #         f += precision
-    #         rem_t = _getTemps(tmin, tmax, c2, N, f)
-    #         k += 1
-    #         if args.debug_flag: print (k, rem_t[-1])
-        
-    # print()
-    # print()
     print('Initial Parameters')
     print('Tmin: %12.6f | Tmax: %12.6f | N: %i ' % (tmin, tmax, N))
-    # print('1st Guessed Temperatures')
-    # print(rem_1)
-    # print('Optimized Temperatures')
-    print(rem_t)
-    # print('Number of Replicas')
-    print(len(rem_t))
-    for t in enumerate(rem_t):
-        pass
-    
-    plt.plot(np.arange(len(rem_1)), np.array([tmin] * len(rem_1)), label='Tmin')
-    plt.plot(np.arange(len(rem_1)), np.array([tmax] * len(rem_1)), label='Tmax')
+    print('Number of Replicas {0:4d}'.format(len(rem_t)))
+    print('Copy paste the following line(s) in the ipi input')
+    print
+    msg = '<temp_list units=\'Kelvin\'['
+    for t in rem_t:
+        msg += '{:7.2f} '.format(t)
+        if len(msg) > 50 and (len(msg) % 85 > 72): msg += '\n                '
+    msg += '] </temp_list>'
+    print(msg)  
+
+    plt.plot(np.arange(len(rem_t)), np.array([tmin] * len(rem_t)), label='Tmin')
+    plt.plot(np.arange(len(rem_t)), np.array([tmax] * len(rem_t)), label='Tmax')
     plt.plot(np.arange(len(rem_t)), np.array(rem_t), '-o', label='Optimized')
     plt.legend(loc='upper left')
     plt.show()
@@ -76,18 +48,18 @@ def _getTemps(tmin, N, f):
     rem_t = [tmin]
     while True:
         if len(rem_t) == N: break
-        rem_t.append(rem_t[-1] + _DeltaT(rem_t[-1],f))
+        rem_t.append(rem_t[-1] + _DeltaT(rem_t[-1], f))
 
     return rem_t
 
 
 def _DeltaT(T, f):
-    return T*f
+    return T * f
 
 
 def _parser():
     parser = argparse.ArgumentParser(version='%prog 0.1',
-                                     description='Provide optimal temperatures for a REM')
+                                     description='Given a temperature range and a number of replicas, this script will estimate the best temperature fore each replica.')
 
     parser.add_argument('Tmin',
                         action='store',
