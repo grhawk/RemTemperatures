@@ -45,8 +45,9 @@ def main():
     print('Copy paste the following line(s) in the ipi input')
     print
     msg = '<temp_list units=\'Kelvin\'['
-    for t in rem_t:
-        msg += '{:7.2f} '.format(t)
+    msg += '{:7.2f}'.format(rem_t[0])
+    for t in rem_t[1:]:
+        msg += ', {:7.2f}'.format(t)
         if len(msg) > 50 and (len(msg) % 85 > 72): msg += '\n                '
     msg += '] </temp_list>'
     print(msg)  
