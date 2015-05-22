@@ -26,7 +26,7 @@ except ImportError:
 
 
 
-factor = 3  # This is used to initialize the least-square method
+factor = 2  # This is used to initialize the least-square method
 
 def main():
 
