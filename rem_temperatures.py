@@ -1,11 +1,30 @@
 #!/usr/bin/env python3
 
-import matplotlib.pylab as plt
-import numpy as np
-import argparse
-import sys
-import numpy as np
-import scipy.optimize as optim
+
+graph = True
+try:
+    import argparse
+    import sys
+    import numpy as np
+    import scipy.optimize as optim
+except ImportError:
+    print('You miss some libraries... Use the following to install them:')
+    print('sudo aptitude install \\')
+    print('python3-numpy python3-scipy python3-matplotlib')
+    print('')
+    print('See you later!')
+    sys.exit()
+
+try:
+    import matplotlib.pylab as plt
+except ImportError:
+    print('If you want to see a graph you should install matplotlib ;)')
+    print('Use:')
+    print('sudo aptitude install python3-matplolib')
+    graph = False
+
+
+
 
 factor = 3  # This is used to initialize the least-square method
 
@@ -19,7 +38,6 @@ def main():
 
     f = optim.leastsq(_tominimize, factor, args=(tmin, tmax, N))[0][0]
     rem_t = _getTemps(tmin, N, f)
-    plt.plot(np.arange(len(rem_t)), np.array(rem_t), '-*', label='1st Guess')
 
     print('Initial Parameters')
     print('Tmin: %12.6f | Tmax: %12.6f | N: %i ' % (tmin, tmax, N))
@@ -33,11 +51,12 @@ def main():
     msg += '] </temp_list>'
     print(msg)  
 
-    plt.plot(np.arange(len(rem_t)), np.array([tmin] * len(rem_t)), label='Tmin')
-    plt.plot(np.arange(len(rem_t)), np.array([tmax] * len(rem_t)), label='Tmax')
-    plt.plot(np.arange(len(rem_t)), np.array(rem_t), '-o', label='Optimized')
-    plt.legend(loc='upper left')
-    plt.show()
+    if graph:
+        plt.plot(np.arange(len(rem_t)), np.array([tmin] * len(rem_t)), label='Tmin')
+        plt.plot(np.arange(len(rem_t)), np.array([tmax] * len(rem_t)), label='Tmax')
+        plt.plot(np.arange(len(rem_t)), np.array(rem_t), '-o', label='Optimized')
+        plt.legend(loc='upper left')
+        plt.show()
 
 def _tominimize(f, tmin, tmax, N):
     temp_list = _getTemps(tmin, N, f)
