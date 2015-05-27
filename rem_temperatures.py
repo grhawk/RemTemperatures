@@ -10,7 +10,7 @@ try:
 except ImportError:
     print('You miss some libraries... Use the following to install them:')
     print('sudo aptitude install \\')
-    print('python3-numpy python3-scipy python3-matplotlib')
+    print('python3-numpy python3-scipy python3-matplotlib python3-args')
     print('')
     print('See you later!')
     sys.exit()
@@ -78,8 +78,8 @@ def _DeltaT(T, f):
 
 
 def _parser():
-    parser = argparse.ArgumentParser(version='%prog 0.1',
-                                     description='Given a temperature range and a number of replicas, this script will estimate the best temperature fore each replica.')
+    parser = argparse.ArgumentParser(
+        description='Given a temperature range and a number of replicas, this script will estimate the best temperature fore each replica.')
 
     parser.add_argument('Tmin',
                         action='store',
