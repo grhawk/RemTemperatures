@@ -44,7 +44,7 @@ def main():
     print('Number of Replicas {0:4d}'.format(len(rem_t)))
     print('Copy paste the following line(s) in the ipi input')
     print
-    msg = '<temp_list units=\'Kelvin\'['
+    msg = '<temp_list units=\'kelvin\'> ['
     msg += '{:7.2f}'.format(rem_t[0])
     for t in rem_t[1:]:
         msg += ', {:7.2f}'.format(t)
