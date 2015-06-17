@@ -36,8 +36,10 @@ def main():
     N = int(args.N)
 #    rp = 1. - args.rp
 
-    f = optim.leastsq(_tominimize, factor, args=(tmin, tmax, N))[0][0]
-    rem_t = _getTemps(tmin, N, f)
+#    f = optim.leastsq(_tominimize, factor, args=(tmin, tmax, N))[0][0]
+#    rem_t = _getTemps(tmin, N, f)
+    rem_t = remTempEstimator(tmin, tmax, N).t_list
+    print(rem_t)
 
     print('Initial Parameters')
     print('Tmin: %12.6f | Tmax: %12.6f | N: %i ' % (tmin, tmax, N))
@@ -50,7 +52,7 @@ def main():
         msg += ', {:7.2f}'.format(t)
         if len(msg) > 50 and (len(msg) % 85 > 72): msg += '\n                '
     msg += '] </temp_list>'
-    print(msg)  
+    print(msg)
 
     if graph:
         plt.plot(np.arange(len(rem_t)), np.array([tmin] * len(rem_t)), label='Tmin')
@@ -58,24 +60,6 @@ def main():
         plt.plot(np.arange(len(rem_t)), np.array(rem_t), '-o', label='Optimized')
         plt.legend(loc='upper left')
         plt.show()
-
-def _tominimize(f, tmin, tmax, N):
-    temp_list = _getTemps(tmin, N, f)
-    return tmax - temp_list[-1]
-    
-def _getTemps(tmin, N, f):
-
-    rem_t = [tmin]
-    while True:
-        if len(rem_t) == N: break
-        rem_t.append(rem_t[-1] + _DeltaT(rem_t[-1], f))
-
-    return rem_t
-
-
-def _DeltaT(T, f):
-    return T * f
-
 
 def _parser():
     parser = argparse.ArgumentParser(
@@ -104,6 +88,31 @@ def _parser():
 
 
     return parser.parse_args()
+
+
+class remTempEstimator(list):
+
+    def __init__(self, tmin, tmax, N):
+        f = optim.leastsq(self._tominimize, factor, args=(tmin, tmax, N))[0][0]
+        self.t_list = self._getTemps(tmin, N, f)
+#        print(self)
+
+    def _tominimize(self, f, tmin, tmax, N):
+        temp_list = self._getTemps(tmin, N, f)
+        return tmax - temp_list[-1]
+
+    def _getTemps(self, tmin, N, f):
+
+        rem_t = [tmin]
+        while True:
+            if len(rem_t) == N: break
+            rem_t.append(rem_t[-1] + self._DeltaT(rem_t[-1], f))
+
+        return rem_t
+
+
+    def _DeltaT(self, T, f):
+        return T * f
 
 
 if __name__ == '__main__':
