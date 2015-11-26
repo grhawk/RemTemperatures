@@ -106,13 +106,15 @@ class remTempEstimator(list):
         rem_t = [tmin]
         while True:
             if len(rem_t) == N: break
-            rem_t.append(rem_t[-1] + self._DeltaT(rem_t[-1], f))
+            rem_t.append(rem_t[-1] + self._DeltaT(rem_t[-1], f, len(rem_t)))
 
         return rem_t
 
 
-    def _DeltaT(self, T, f):
-        return T * f
+    def _DeltaT(self, T, f, n):
+        c = .3
+        return f * (np.exp(c*n) - np.exp(c*n-c))
+        # return T * f
 
 
 if __name__ == '__main__':
