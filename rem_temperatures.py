@@ -34,11 +34,14 @@ def main():
     tmin = args.Tmin
     tmax = args.Tmax
     N = int(args.N)
+    c = args.adjust
+    if c == None:
+        c = .3
 #    rp = 1. - args.rp
 
 #    f = optim.leastsq(_tominimize, factor, args=(tmin, tmax, N))[0][0]
 #    rem_t = _getTemps(tmin, N, f)
-    rem_t = remTempEstimator(tmin, tmax, N).t_list
+    rem_t = remTempEstimator(tmin, tmax, N, c).t_list
     print(rem_t)
 
     print('Initial Parameters')
@@ -80,6 +83,11 @@ def _parser():
                         type=int,
                         help='Number of replicas')
 
+    parser.add_argument('--adjust',
+                        action='store',
+                        type=float,
+                        help='scaling temperature factor')
+
     parser.add_argument('--debug',
                         action='store_true',
                         dest='debug_flag',
@@ -92,7 +100,8 @@ def _parser():
 
 class remTempEstimator(list):
 
-    def __init__(self, tmin, tmax, N):
+    def __init__(self, tmin, tmax, N, c=.3):
+        self.c = c
         f = optim.leastsq(self._tominimize, factor, args=(tmin, tmax, N))[0][0]
         self.t_list = self._getTemps(tmin, N, f)
 #        print(self)
@@ -112,7 +121,7 @@ class remTempEstimator(list):
 
 
     def _DeltaT(self, T, f, n):
-        c = .3
+        c = self.c
         return f * (np.exp(c*n) - np.exp(c*n-c))
         # return T * f
 
